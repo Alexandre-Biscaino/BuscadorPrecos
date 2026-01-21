@@ -11,7 +11,7 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 import altair as alt 
 
-# --- 1. CONFIGURAÇÃO VISUAL ---
+# --- 1. CONFIGURAÇÃO VISUAL (CORTINA DE FERRO) ---
 st.set_page_config(page_title="Pesquisador de Preços", page_icon="🔎", layout="wide")
 
 st.markdown("""
@@ -21,29 +21,27 @@ st.markdown("""
     * {font-family: 'Roboto', sans-serif;}
     .stApp {background-color: #f0f2f6 !important; color: #31333F !important;}
 
-    /* --- TENTATIVA DE BLOQUEIO DO RODAPÉ (CSS FORCE) --- */
-    
-    /* 1. Esconde o elemento footer padrão */
-    footer {visibility: hidden !important; display: none !important;}
-    
-    /* 2. Esconde o header padrão */
-    header {visibility: hidden !important; display: none !important;}
-    
-    /* 3. Esconde classes específicas do Streamlit Cloud */
-    .st-emotion-cache-16txtl3 {display: none !important;}
-    .st-emotion-cache-z5fcl4 {padding-top: 0rem !important;}
-    
-    /* 4. TRUQUE DO OVERLAY: Cria uma faixa branca no rodapé para tapar tudo */
+    /* 1. Esconde rodapés internos conhecidos */
+    footer, header, [data-testid="stHeader"], [data-testid="stFooter"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* 2. A CORTINA: Cria uma faixa que cobre o rodapé na força bruta */
     div.stApp::after {
-        content: "";
+        content: "Sistema V22 | Uso Exclusivo"; /* Texto para disfarçar */
         position: fixed;
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 40px; /* Altura da faixa */
-        background-color: #f0f2f6; /* Mesma cor do fundo */
-        z-index: 999999; /* Fica por cima de tudo */
-        pointer-events: none; /* Permite clicar através se necessário */
+        height: 50px; /* Altura suficiente para cobrir o botão */
+        background-color: #f0f2f6; /* Cor do fundo */
+        color: #b0b0b0;
+        text-align: center;
+        padding-top: 15px;
+        font-size: 12px;
+        z-index: 99999999; /* Fica na frente de absolutamente tudo */
+        pointer-events: auto; /* Bloqueia o clique no que estiver atrás */
     }
 
     /* --- ESTILOS DO APP --- */
@@ -234,7 +232,7 @@ with st.sidebar:
     st.caption(f"Amazon: {st.session_state.status_amz}")
 
 # --- 6. TELA PRINCIPAL ---
-st.markdown("<div class='header-style'><h1>🔎 Pesquisador de Preços <br><span style='font-size:16px'>Edição Profissional V21</span></h1></div>", unsafe_allow_html=True)
+st.markdown("<div class='header-style'><h1>🔎 Pesquisador de Preços <br><span style='font-size:16px'>Edição Profissional V22</span></h1></div>", unsafe_allow_html=True)
 
 if produto_input:
     st.markdown("##### 🌍 Pesquisa Rápida (Outras Lojas):")
