@@ -11,43 +11,42 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 import altair as alt 
 
-# --- 1. CONFIGURAÇÃO E CSS (VISUAL NUCLEAR) ---
+# --- 1. CONFIGURAÇÃO VISUAL ---
 st.set_page_config(page_title="Pesquisador de Preços", page_icon="🔎", layout="wide")
 
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
     
-    /* Configuração Geral */
     * {font-family: 'Roboto', sans-serif;}
     .stApp {background-color: #f0f2f6 !important; color: #31333F !important;}
+
+    /* --- TENTATIVA DE BLOQUEIO DO RODAPÉ (CSS FORCE) --- */
     
-    /* --- BLOQUEIO TOTAL DE MENUS E RODAPÉS --- */
+    /* 1. Esconde o elemento footer padrão */
+    footer {visibility: hidden !important; display: none !important;}
     
-    /* Esconde o menu superior (3 pontinhos e Deploy) */
-    header, [data-testid="stHeader"] {
-        visibility: hidden !important;
-        display: none !important;
+    /* 2. Esconde o header padrão */
+    header {visibility: hidden !important; display: none !important;}
+    
+    /* 3. Esconde classes específicas do Streamlit Cloud */
+    .st-emotion-cache-16txtl3 {display: none !important;}
+    .st-emotion-cache-z5fcl4 {padding-top: 0rem !important;}
+    
+    /* 4. TRUQUE DO OVERLAY: Cria uma faixa branca no rodapé para tapar tudo */
+    div.stApp::after {
+        content: "";
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 40px; /* Altura da faixa */
+        background-color: #f0f2f6; /* Mesma cor do fundo */
+        z-index: 999999; /* Fica por cima de tudo */
+        pointer-events: none; /* Permite clicar através se necessário */
     }
-    
-    /* Esconde o rodapé padrão (Made with Streamlit) */
-    footer, [data-testid="stFooter"] {
-        visibility: hidden !important;
-        display: none !important;
-        height: 0px !important;
-    }
-    
-    /* Tenta esconder a barra de ferramentas inferior do modo Embed */
-    .stApp > footer {display: none !important;}
-    div[class*="viewerBadge"] {display: none !important;}
-    
-    /* Remove espaço em branco no topo */
-    .block-container {
-        padding-top: 0rem !important;
-        padding-bottom: 0rem !important;
-    }
-    
-    /* --- ESTILO DOS CARDS E BOTÕES --- */
+
+    /* --- ESTILOS DO APP --- */
     .header-style {
         background: linear-gradient(90deg, #0052cc 0%, #0073e6 100%);
         padding: 20px;
@@ -235,7 +234,7 @@ with st.sidebar:
     st.caption(f"Amazon: {st.session_state.status_amz}")
 
 # --- 6. TELA PRINCIPAL ---
-st.markdown("<div class='header-style'><h1>🔎 Pesquisador de Preços <br><span style='font-size:16px'>Edição Profissional V20</span></h1></div>", unsafe_allow_html=True)
+st.markdown("<div class='header-style'><h1>🔎 Pesquisador de Preços <br><span style='font-size:16px'>Edição Profissional V21</span></h1></div>", unsafe_allow_html=True)
 
 if produto_input:
     st.markdown("##### 🌍 Pesquisa Rápida (Outras Lojas):")
