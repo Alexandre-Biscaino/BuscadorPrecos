@@ -11,16 +11,32 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 import altair as alt 
 
-# --- 1. CONFIGURAÇÃO VISUAL ---
+# --- 1. CONFIGURAÇÃO E CSS (VISUAL BLINDADO) ---
 st.set_page_config(page_title="Pesquisador de Preços", page_icon="🔎", layout="wide")
 
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+    
+    /* Força o tema claro e fonte */
     * {font-family: 'Roboto', sans-serif;}
     .stApp {background-color: #f0f2f6 !important; color: #31333F !important;}
-    .stException, #MainMenu, footer {display: none !important;}
     
+    /* --- A MÁGICA DE ESCONDER TUDO --- */
+    /* Esconde menu hamburguer (três riscos) */
+    #MainMenu {visibility: hidden; display: none;}
+    
+    /* Esconde rodapé padrão "Made with Streamlit" */
+    footer {visibility: hidden; display: none;}
+    
+    /* Esconde cabeçalho padrão (onde fica o botão Fork e Deploy) */
+    header {visibility: hidden; display: none;}
+    
+    /* Esconde a barra inferior do modo Embed (onde fica o botão Fullscreen) */
+    .stApp > footer {display: none !important;}
+    .viewerBadge_container__1QSob {display: none !important;}
+    
+    /* --- ESTILOS DO APP --- */
     .header-style {
         background: linear-gradient(90deg, #0052cc 0%, #0073e6 100%);
         padding: 20px;
@@ -69,7 +85,7 @@ if 'dados' not in st.session_state: st.session_state.dados = []
 if 'status_ml' not in st.session_state: st.session_state.status_ml = "Aguardando"
 if 'status_amz' not in st.session_state: st.session_state.status_amz = "Aguardando"
 
-# --- 3. LÓGICA INTELIGENTE ---
+# --- 3. LÓGICA ---
 def converter_preco(texto):
     try:
         if isinstance(texto, (float, int)): return float(texto)
@@ -83,11 +99,9 @@ def calcular_similaridade(a, b):
     return SequenceMatcher(None, a.lower(), b.lower()).ratio()
 
 def obter_headers():
-    # Lista ampliada de disfarces
     agentes = [
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0"
     ]
     return {
@@ -97,12 +111,11 @@ def obter_headers():
         "Referer": "https://www.google.com/"
     }
 
-# --- 4. ROBÔS COM SISTEMA DE "TEIMOSIA" (RETRY) ---
+# --- 4. ROBÔS ---
 def buscar_mercadolivre(produto):
     url = f"https://lista.mercadolivre.com.br/{produto.replace(' ', '-')}"
     tentativas = 0
-    
-    while tentativas < 3: # Tenta até 3 vezes
+    while tentativas < 3:
         try:
             resp = requests.get(url, headers=obter_headers(), timeout=10)
             if resp.status_code == 200:
@@ -127,20 +140,17 @@ def buscar_mercadolivre(produto):
                         if val > 5: lista.append({'Loja': 'Mercado Livre', 'Produto': titulo, 'Valor_Visual': f"R$ {txt}", 'Valor_Numerico': val, 'Link': link, 'Tipo': 'Auto'})
                     except: continue
                 return lista
-            else:
-                raise Exception("Bloqueio")
+            else: raise Exception("Bloqueio")
         except:
             tentativas += 1
-            time.sleep(1.5) # Espera um pouco antes de tentar de novo
-    
+            time.sleep(1)
     st.session_state.status_ml = "Instável/Bloqueio ⚠️"
     return []
 
 def buscar_amazon(produto):
     url = f"https://www.amazon.com.br/s?k={produto.replace(' ', '+')}"
     tentativas = 0
-    
-    while tentativas < 3: # Tenta 3 vezes
+    while tentativas < 3:
         try:
             resp = requests.get(url, headers=obter_headers(), timeout=10)
             if resp.status_code == 200:
@@ -160,12 +170,10 @@ def buscar_amazon(produto):
                             lista.append({'Loja': 'Amazon', 'Produto': titulo, 'Valor_Visual': f"R$ {val_txt}", 'Valor_Numerico': val, 'Link': link, 'Tipo': 'Auto'})
                     except: continue
                 return lista
-            else:
-                raise Exception("Bloqueio")
+            else: raise Exception("Bloqueio")
         except:
             tentativas += 1
-            time.sleep(2) # Espera 2 segundos e tenta de novo
-            
+            time.sleep(1.5)
     st.session_state.status_amz = "Bloqueio Temporário 🔒"
     return []
 
@@ -178,9 +186,9 @@ def gerar_links_extras(termo):
         {'Loja': 'Google Shopping', 'Link': f"https://www.google.com/search?q={termo.replace(' ', '+')}&tbm=shop"}
     ]
 
-# --- 5. INTERFACE ---
+# --- 5. INTERFACE (SIDEBAR) ---
 with st.sidebar:
-    st.header("🎛️ Controle")
+    st.header("🎛️ Painel de Controle")
     produto_input = st.text_input("O que você procura?", placeholder="Ex: iPhone 15")
     
     st.markdown("### ⚙️ Filtros")
@@ -189,7 +197,7 @@ with st.sidebar:
     
     if st.button("🔎 PESQUISAR AGORA"):
         st.session_state.dados = []
-        with st.spinner("Negociando com os servidores (Tentativa 1 a 3)..."):
+        with st.spinner("Pesquisando preços..."):
             ml = buscar_mercadolivre(produto_input)
             amz = buscar_amazon(produto_input)
             st.session_state.dados = ml + amz
@@ -245,7 +253,6 @@ if not df.empty:
         top3 = df.head(3).reset_index(drop=True)
         c1, c2, c3 = st.columns(3)
         
-        # Pódio
         if len(top3) > 0:
             with c1: st.markdown(f"<div class='podium-card gold'><h2>🥇 1º Lugar</h2><div class='price-tag'>{top3.iloc[0]['Valor_Visual']}</div><div class='store-tag'>{top3.iloc[0]['Loja']}</div><p style='font-size:12px'>{top3.iloc[0]['Produto'][:40]}...</p></div>", unsafe_allow_html=True)
         if len(top3) > 1:
