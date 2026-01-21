@@ -11,7 +11,7 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 import altair as alt 
 
-# --- 1. CONFIGURAÇÃO VISUAL (CORTINA DE FERRO) ---
+# --- 1. CONFIGURAÇÃO VISUAL ---
 st.set_page_config(page_title="Pesquisador de Preços", page_icon="🔎", layout="wide")
 
 st.markdown("""
@@ -21,28 +21,9 @@ st.markdown("""
     * {font-family: 'Roboto', sans-serif;}
     .stApp {background-color: #f0f2f6 !important; color: #31333F !important;}
 
-    /* 1. Esconde rodapés internos conhecidos */
-    footer, header, [data-testid="stHeader"], [data-testid="stFooter"] {
-        display: none !important;
-        visibility: hidden !important;
-    }
-
-    /* 2. A CORTINA: Cria uma faixa que cobre o rodapé na força bruta */
-    div.stApp::after {
-        content: "Sistema V22 | Uso Exclusivo"; /* Texto para disfarçar */
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 50px; /* Altura suficiente para cobrir o botão */
-        background-color: #f0f2f6; /* Cor do fundo */
-        color: #b0b0b0;
-        text-align: center;
-        padding-top: 15px;
-        font-size: 12px;
-        z-index: 99999999; /* Fica na frente de absolutamente tudo */
-        pointer-events: auto; /* Bloqueia o clique no que estiver atrás */
-    }
+    /* Esconde o menu superior (3 pontinhos) e rodapé interno */
+    header, [data-testid="stHeader"] {display: none !important;}
+    footer, [data-testid="stFooter"] {display: none !important;}
 
     /* --- ESTILOS DO APP --- */
     .header-style {
@@ -232,7 +213,7 @@ with st.sidebar:
     st.caption(f"Amazon: {st.session_state.status_amz}")
 
 # --- 6. TELA PRINCIPAL ---
-st.markdown("<div class='header-style'><h1>🔎 Pesquisador de Preços <br><span style='font-size:16px'>Edição Profissional V22</span></h1></div>", unsafe_allow_html=True)
+st.markdown("<div class='header-style'><h1>🔎 Pesquisador de Preços <br><span style='font-size:16px'>Edição Profissional Final</span></h1></div>", unsafe_allow_html=True)
 
 if produto_input:
     st.markdown("##### 🌍 Pesquisa Rápida (Outras Lojas):")
