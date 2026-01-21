@@ -11,32 +11,43 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 import altair as alt 
 
-# --- 1. CONFIGURAÇÃO E CSS (VISUAL BLINDADO) ---
+# --- 1. CONFIGURAÇÃO E CSS (VISUAL NUCLEAR) ---
 st.set_page_config(page_title="Pesquisador de Preços", page_icon="🔎", layout="wide")
 
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
     
-    /* Força o tema claro e fonte */
+    /* Configuração Geral */
     * {font-family: 'Roboto', sans-serif;}
     .stApp {background-color: #f0f2f6 !important; color: #31333F !important;}
     
-    /* --- A MÁGICA DE ESCONDER TUDO --- */
-    /* Esconde menu hamburguer (três riscos) */
-    #MainMenu {visibility: hidden; display: none;}
+    /* --- BLOQUEIO TOTAL DE MENUS E RODAPÉS --- */
     
-    /* Esconde rodapé padrão "Made with Streamlit" */
-    footer {visibility: hidden; display: none;}
+    /* Esconde o menu superior (3 pontinhos e Deploy) */
+    header, [data-testid="stHeader"] {
+        visibility: hidden !important;
+        display: none !important;
+    }
     
-    /* Esconde cabeçalho padrão (onde fica o botão Fork e Deploy) */
-    header {visibility: hidden; display: none;}
+    /* Esconde o rodapé padrão (Made with Streamlit) */
+    footer, [data-testid="stFooter"] {
+        visibility: hidden !important;
+        display: none !important;
+        height: 0px !important;
+    }
     
-    /* Esconde a barra inferior do modo Embed (onde fica o botão Fullscreen) */
+    /* Tenta esconder a barra de ferramentas inferior do modo Embed */
     .stApp > footer {display: none !important;}
-    .viewerBadge_container__1QSob {display: none !important;}
+    div[class*="viewerBadge"] {display: none !important;}
     
-    /* --- ESTILOS DO APP --- */
+    /* Remove espaço em branco no topo */
+    .block-container {
+        padding-top: 0rem !important;
+        padding-bottom: 0rem !important;
+    }
+    
+    /* --- ESTILO DOS CARDS E BOTÕES --- */
     .header-style {
         background: linear-gradient(90deg, #0052cc 0%, #0073e6 100%);
         padding: 20px;
@@ -224,7 +235,7 @@ with st.sidebar:
     st.caption(f"Amazon: {st.session_state.status_amz}")
 
 # --- 6. TELA PRINCIPAL ---
-st.markdown("<div class='header-style'><h1>🔎 Pesquisador de Preços <br><span style='font-size:16px'>Edição Profissional V19</span></h1></div>", unsafe_allow_html=True)
+st.markdown("<div class='header-style'><h1>🔎 Pesquisador de Preços <br><span style='font-size:16px'>Edição Profissional V20</span></h1></div>", unsafe_allow_html=True)
 
 if produto_input:
     st.markdown("##### 🌍 Pesquisa Rápida (Outras Lojas):")
